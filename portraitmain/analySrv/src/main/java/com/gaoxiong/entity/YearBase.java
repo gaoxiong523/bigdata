@@ -15,6 +15,18 @@ public class YearBase {
      * 数量
      */
     private Long count;
+    /**
+     * 分组字段
+     */
+    private String groupfield;
+
+    public String getGroupfield () {
+        return groupfield;
+    }
+
+    public void setGroupfield ( String groupfield ) {
+        this.groupfield = groupfield;
+    }
 
     public String getYearType () {
         return yearType;

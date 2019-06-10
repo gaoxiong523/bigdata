@@ -1,21 +1,19 @@
 package com.gaoxiong.map;
 
-import com.gaoxiong.entity.YearBase;
-import com.gaoxiong.utils.DateUtil;
+import com.gaoxiong.entity.EmailInfo;
+import com.gaoxiong.utils.EmailUtils;
 import com.gaoxiong.utils.HBaseUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.MapFunction;
 
 /**
  * @author gaoxiong
- * @ClassName YearBaseMap
- * @Description TODO
- * @date 2019/6/3 0003 下午 11:04
+ * @Description 邮箱地址
+ * @date 2019/6/7 0007 下午 5:53
  */
-public class YearBaseMap implements MapFunction<String, YearBase> {
-
+public class EmailMap implements MapFunction<String,EmailInfo> {
     @Override
-    public YearBase map ( String s ) throws Exception {
+    public EmailInfo map ( String s ) throws Exception {
         if (StringUtils.isBlank(s)) {
             return null;
         }
@@ -29,18 +27,18 @@ public class YearBaseMap implements MapFunction<String, YearBase> {
         String registerTime = userInfos[6];
         //终端类型0，pc 1，移动端，2，小程序
         String userType = userInfos[7];
-        String yearBaseType = DateUtil.getYearBaseByAge(age);
+        String emailTypeBy = EmailUtils.getEmailTypeBy(email);
 
         String tableName = "userflaginfo";
         String rowKey = userId;
         String familyName = "baseinfo";
-        String colum = "yaerbase";//年代
-        HBaseUtils.put(tableName, rowKey, familyName, colum, yearBaseType);
-        YearBase yearBase = new YearBase();
-        String groupfield="yearbase=="+yearBaseType;
-        yearBase.setYearType(yearBaseType);
-        yearBase.setCount(1L);
-        yearBase.setGroupfield(groupfield);
-        return yearBase;
+        String colum = "emailinfo";//运营商
+        HBaseUtils.put(tableName, rowKey, familyName, colum, emailTypeBy);
+        EmailInfo emailInfo = new EmailInfo();
+        String groupfield="carrierinfo=="+emailTypeBy;
+        emailInfo.setEmailTye(emailTypeBy);
+        emailInfo.setCount(1L);
+        emailInfo.setGroupfield(groupfield);
+        return emailInfo;
     }
 }

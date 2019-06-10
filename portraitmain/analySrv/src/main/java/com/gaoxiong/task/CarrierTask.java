@@ -1,7 +1,10 @@
 package com.gaoxiong.task;
 
+import com.gaoxiong.entity.CarrierInfo;
 import com.gaoxiong.entity.YearBase;
+import com.gaoxiong.map.CarrierMap;
 import com.gaoxiong.map.YearBaseMap;
+import com.gaoxiong.reduce.CarrierReduce;
 import com.gaoxiong.reduce.YearBaseReduce;
 import com.gaoxiong.utils.MongoUtil;
 import org.apache.flink.api.java.DataSet;
@@ -17,7 +20,7 @@ import java.util.List;
  * @Description TODO
  * @date 2019/6/3 0003 下午 11:00
  */
-public class YearBaseTask {
+public class CarrierTask {
     public static void main ( String[] args ) {
         final ParameterTool params = ParameterTool.fromArgs(args);
         //set up the execution environment
@@ -26,26 +29,26 @@ public class YearBaseTask {
         env.getConfig().setGlobalJobParameters(params);
         //get input data
         DataSet<String> text = env.readTextFile(params.get("input"));
-        DataSet<YearBase> mapresult =text.map(new YearBaseMap());
-        DataSet<YearBase> reduceresult =mapresult.groupBy("groupfield").reduce(new YearBaseReduce());
+        DataSet<CarrierInfo> mapresult =text.map(new CarrierMap());
+        DataSet<CarrierInfo> reduceresult =mapresult.groupBy("groupfield").reduce(new CarrierReduce());
         try {
-            List<YearBase> resultList = reduceresult.collect();
-            for (YearBase yearBase : resultList) {
-                String yearType = yearBase.getYearType();
-                Long count = yearBase.getCount();
-                Document doc = MongoUtil.findOneBy("yearbasestatics", "portrait", yearType);
+            List<CarrierInfo> resultList = reduceresult.collect();
+            for (CarrierInfo carrierInfo : resultList) {
+                String carrier = carrierInfo.getCarrier();
+                Long count = carrierInfo.getCount();
+                Document doc = MongoUtil.findOneBy("carrierstatics", "portrait", carrier);
                 if (doc == null) {
                     doc = new Document();
-                    doc.put("yearbasetype", yearType);
+                    doc.put("carrier", carrier);
                     doc.put("count", count);
                 } else {
                     Long countpre = doc.getLong("count");
                     Long total = countpre + count;
                     doc.put("count", total);
                 }
-                MongoUtil.saveorupdatemongo("yearbasestatics", doc, "portrait");
+                MongoUtil.saveorupdatemongo("carrierstatics", doc, "portrait");
             }
-            env.execute("year base");
+            env.execute("carrier anally");
         } catch (Exception e) {
             e.printStackTrace();
         }
