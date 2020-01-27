@@ -62,3 +62,16 @@ HOSTNAME=hadoop131
 
 
 ```
+```text
+
+
+vi /etc/profile
+#JAVAHOME
+export JAVA_HOME=/opt/module/jdk1.8.0_211
+export PATH=$PATH:$JAVA_HOME/bin
+#HADOOPHOME
+export HADOOP_HOME=/opt/module/hadoop-2.8.5
+export PATH=$PATH:$HADOOP_HOME/bin
+export PATH=$PATH:$HADOOP_HOME/sbin
+
+```

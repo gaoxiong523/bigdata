@@ -1,5 +1,7 @@
 package com.gaoxiong.utils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,5 +40,21 @@ public class DateUtil {
             yearBaseType = "10后";
         }
         return yearBaseType;
+    }
+
+    public static int getDaysBetweenByStartAndEnd ( String startTime, String endTime, String dateFormatString ) throws ParseException {
+        DateFormat dateFormat = new SimpleDateFormat(dateFormatString);
+        Date start = dateFormat.parse(startTime);
+        Date end = dateFormat.parse(endTime);
+        Calendar startCalendar = Calendar.getInstance();
+        Calendar endCalenar = Calendar.getInstance();
+        startCalendar.setTime(start);
+        endCalenar.setTime(end);
+        int days = 0;
+        while (startCalendar.before(endCalenar)) {
+            startCalendar.add(Calendar.DAY_OF_YEAR, 1);
+            days+=1;
+        }
+        return days;
     }
 }
