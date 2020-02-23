@@ -100,3 +100,47 @@ nohup bin/hiveserver2 > s2.log 2>&1 &
       ./schematool -initSchema -dbType mysql 
 
 ```
+```text
+1．开启hive中间传输数据压缩功能
+hive (default)>set hive.exec.compress.intermediate=true;
+2．开启mapreduce中map输出压缩功能
+hive (default)>set mapreduce.map.output.compress=true;
+3．设置mapreduce中map输出数据的压缩方式
+hive (default)>set mapreduce.map.output.compress.codec=
+ org.apache.hadoop.io.compress.SnappyCodec;
+
+```
+1.格式存储主要 是  orc 和parquet
+2.根据引擎选择存储方式,
+3.hive 用 orc,spark 用parquet,
+4,一般 采用  snappy压缩
+
+##hive优化
+```text
+1.fetch抓取 ,默认 不用改
+2.本地模式 
+    set hive.exec.mode.local.auto=true;  //开启本地mr
+    //设置local mr的最大输入数据量，当输入数据量小于这个值时采用local  mr的方式，默认为134217728，即128M
+    set hive.exec.mode.local.auto.inputbytes.max=50000000;
+    //设置local mr的最大输入文件个数，当输入文件个数小于这个值时采用local mr的方式，默认为4
+    set hive.exec.mode.local.auto.input.files.max=10;
+3.表的优化
+    1.小表,大表join
+        新版的hive已经对小表JOIN大表和大表JOIN小表进行了优化。小表放在左边和右边已经没有明显区别。
+    2.大表join  大表
+    3.MapJoin(小表join大表)
+        （1）设置自动选择Mapjoin
+        set hive.auto.convert.join = true; 默认为true
+        （2）大表小表的阈值设置（默认25M一下认为是小表）：
+        set hive.mapjoin.smalltable.filesize=25000000;
+    4.group by     
+        开启Map端聚合参数设置
+        	（1）是否在Map端进行聚合，默认为True
+        set hive.map.aggr = true
+        （2）在Map端进行聚合操作的条目数目
+        set hive.groupby.mapaggr.checkinterval = 100000
+        （3）有数据倾斜的时候进行负载均衡（默认是false）
+        set hive.groupby.skewindata = true
+    5.count
+
+```
